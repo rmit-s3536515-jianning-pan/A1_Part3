@@ -22,14 +22,14 @@ import java.util.regex.Pattern;
 
 public class Part3 {
 
-	
-	public static int INTFIELD = 4;
-	
+
 	
 	// 29 + 32 + 31 + 7 
 	private static List<DataRecord> records = new ArrayList<DataRecord>();
 	private static List<Page> pages = new ArrayList<>();
-	
+	private static int count = 0;
+	private static int pagesize;
+	private static long timeelapsd;
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		String filename = null;
@@ -43,12 +43,14 @@ public class Part3 {
 				if(isNumeric(args[2])) { // the page size should be int
 					String[] checkFile = args[3].split("\\.");
 					if(checkFile.length==2 && checkFile[1].equalsIgnoreCase("csv")) {
-						
+						pagesize = Integer.parseInt(args[2]);
 						filename = args[3];
-						outputfilename = "heap."+Integer.parseInt(args[2]);
-//						write(filename,outputfilename); // write the data 
-						readFile(outputfilename); // read the data
-//						System.out.println(pages.get(0).getRecords().size());
+						outputfilename = "heap."+pagesize;
+						write(filename,outputfilename); // write the data 
+						System.out.println("There are  " +pages.size() + " Pages");
+						System.out.println("There are " + count + " records loaded to heap file");
+						System.out.println("The time taken to load the data to heap file is " + timeelapsd + " seconds !");
+
 					}
 					else {
 						System.out.println("file name is not correcet! Should be CSV FILE");
@@ -68,7 +70,7 @@ public class Part3 {
 
 		Pattern pattern = Pattern.compile(",");
 		
-		
+		long start = System.currentTimeMillis();
 		try(BufferedReader in =new BufferedReader(new FileReader(filename));){
 			
 			FileOutputStream fos = new FileOutputStream(outputfilename);
@@ -102,22 +104,17 @@ public class Part3 {
 							record[5], record[6], Integer.parseInt(record[7]), record[8], record[9], record[10],Integer.parseInt(record[11]), record[12]);
 					
 				
-//				System.out.println("Record length " + dr.getRecordLength());
-				
 				perPageLength += dr.getRecordLength();
-//				System.out.println(perPageLength);
 				
-				if(perPageLength > 4096) { 
+				if(perPageLength > 4096) {  // if the record is added , the page will be over 
 					pages.add(new Page(pagecount++,records));
-					System.out.println(pages.get(0).getRecords().size());
+					count +=records.size();
 					records.clear();
 					perPageLength = 0;
-//					System.out.println("Page Break");
-					
-//					out.write("\n".getBytes());
+
 					out.writeObject("\n");
 					writeRecord(out, dr);
-//					out.write("\n".getBytes());
+
 					out.writeObject("\n");
 
 					records.add(dr);
@@ -128,19 +125,19 @@ public class Part3 {
 						records.add(dr);
 						
 						pages.add(new Page(pagecount++,records));
+						count +=records.size();
 						
-//						System.out.println(records.size());
 						records.clear();
 						perPageLength = 0;
 						writeRecord(out, dr);
-//						out.write("\n".getBytes());
+
 						out.writeObject("\n");
 
 					}
 					else {
 						writeRecord(out, dr);
 						
-//						out.write("\n".getBytes());
+
 						out.writeObject("\n");
 
 						records.add(dr);
@@ -155,7 +152,9 @@ public class Part3 {
 			out.close();
 			fos.close();
 			
-			System.out.println("There are " +pages.size() + " Pages");
+			long end = System.currentTimeMillis();
+			timeelapsd = (long) ((end - start)/1000.0);
+			
 			
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -207,9 +206,6 @@ public class Part3 {
 		}
 		
 		
-		
-
-		
 	}
 	
 	public static void writeRecord(ObjectOutputStream raf,DataRecord record) {
@@ -238,13 +234,12 @@ public class Part3 {
 		}
 	}
 	
-	public class EndOfStreamSignal implements Serializable {}
-	public static byte[] getByteForInt(String s) {
-		ByteBuffer buf = ByteBuffer.allocate(INTFIELD);
-		buf.putInt(Integer.parseInt(s));
-		return buf.array();
-	}
-	
+//	public static byte[] getByteForInt(String s) {
+//		ByteBuffer buf = ByteBuffer.allocate(INTFIELD);
+//		buf.putInt(Integer.parseInt(s));
+//		return buf.array();
+//	}
+//	
 	
 	public static boolean isNumeric(String strNum) {
 	    try {
@@ -260,15 +255,10 @@ public class Part3 {
 		 DateFormat outputformat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 	        
 				try {
-					Date date = inputdatetimeformat.parse(value);
-//					System.out.println(outputformat.format(date));
-//					System.out.println(inputdatetimeformat.format(date));
+					Date date = inputdatetimeformat.parse(value);		
 					
-//					System.out.println(date.getTime());
 					Timestamp sqltimestamp = Timestamp.valueOf(outputformat.format(date));
-//					System.out.println(sqltimestamp);
-//					newrow += "'" + sqltimestamp +"',";
-//					ps.setTimestamp(++ids, sqltimestamp);
+
 					return sqltimestamp;
 				} catch (ParseException e) {
 					// TODO Auto-generated catch block

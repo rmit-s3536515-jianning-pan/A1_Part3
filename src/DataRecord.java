@@ -82,7 +82,13 @@ public class DataRecord implements Serializable{
 		return recordlength;
 	}
 
-	
+	public int getDeviceId() {
+		return deviceId;
+	}
+
+	public void setDeviceId(int deviceId) {
+		this.deviceId = deviceId;
+	}
 //	public byte[] getDeviceId() {
 //		return deviceId;
 //	}
