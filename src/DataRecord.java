@@ -5,18 +5,22 @@ import java.nio.ByteBuffer;
 public class DataRecord implements Serializable{
 
 	
-	private byte[] deviceId;
+//	private byte[] deviceId;
+	private int deviceId;
 	private String arrivalTime;
 	private String departureTime;
-	private byte[] durationSeconds;
+//	private byte[] durationSeconds;
+	private long durationSeconds;
 	private String streetMarker;
 	private String sign;
 	private String area;
-	private byte[]  streetId;
+//	private byte[]  streetId;
+	private int  streetId;
 	private String streetName;
 	private String betweenStreet1;
 	private String betweenStreet2;
-	private byte[]  sideofstreet;
+//	private byte[]  sideofstreet;
+	private int sideofstreet;
 	private String inViolation;
 	
 	private int recordlength;
@@ -25,10 +29,34 @@ public class DataRecord implements Serializable{
 	public DataRecord() {
 		
 	}
-	
-	public DataRecord(byte[] deviceId, String arrivalTime, String departureTime, byte[] durationSeconds,
-			String streetMarker, String sign, String area, byte[] streetId, String streetName, String betweenStreet1,
-			String betweenStreet2, byte[] sideofstreet, String inViolation) {
+//	
+//	public DataRecord(byte[] deviceId, String arrivalTime, String departureTime, byte[] durationSeconds,
+//			String streetMarker, String sign, String area, byte[] streetId, String streetName, String betweenStreet1,
+//			String betweenStreet2, byte[] sideofstreet, String inViolation) {
+//		super();
+//		this.deviceId = deviceId;
+//		this.arrivalTime = arrivalTime;
+//		this.departureTime = departureTime;
+//		this.durationSeconds = durationSeconds;
+//		this.streetMarker = streetMarker;
+//		this.sign = sign;
+//		this.area = area;
+//		this.streetId = streetId;
+//		this.streetName = streetName;
+//		this.betweenStreet1 = betweenStreet1;
+//		this.betweenStreet2 = betweenStreet2;
+//		this.sideofstreet = sideofstreet;
+//		this.inViolation = inViolation;
+//		int l = deviceId.length + arrivalTime.getBytes().length + departureTime.getBytes().length+durationSeconds.length +
+//				streetMarker.getBytes().length + sign.getBytes().length + area.getBytes().length + streetId.length +
+//				streetName.getBytes().length + betweenStreet1.getBytes().length + betweenStreet2.getBytes().length +
+//				sideofstreet.length + inViolation.getBytes().length;
+//		this.recordlength = l;
+//	}
+
+	public DataRecord(int deviceId, String arrivalTime, String departureTime, long durationSeconds, String streetMarker,
+			String sign, String area, int streetId, String streetName, String betweenStreet1, String betweenStreet2,
+			int sideofstreet, String inViolation) {
 		super();
 		this.deviceId = deviceId;
 		this.arrivalTime = arrivalTime;
@@ -43,31 +71,29 @@ public class DataRecord implements Serializable{
 		this.betweenStreet2 = betweenStreet2;
 		this.sideofstreet = sideofstreet;
 		this.inViolation = inViolation;
-		int l = deviceId.length + arrivalTime.getBytes().length + departureTime.getBytes().length+durationSeconds.length +
-				streetMarker.getBytes().length + sign.getBytes().length + area.getBytes().length + streetId.length +
+		int l = 4 + arrivalTime.getBytes().length + departureTime.getBytes().length+4+
+				streetMarker.getBytes().length + sign.getBytes().length + area.getBytes().length + 4 +
 				streetName.getBytes().length + betweenStreet1.getBytes().length + betweenStreet2.getBytes().length +
-				sideofstreet.length + inViolation.getBytes().length;
+				4+ inViolation.getBytes().length;
 		this.recordlength = l;
 	}
-
-	
 	
 	public int getRecordLength() {
 		return recordlength;
 	}
 
 	
-	public byte[] getDeviceId() {
-		return deviceId;
-	}
+//	public byte[] getDeviceId() {
+//		return deviceId;
+//	}
 
 
 
-
-
-	public void setDeviceId(byte[] deviceId) {
-		this.deviceId = deviceId;
-	}
+//
+//
+//	public void setDeviceId(byte[] deviceId) {
+//		this.deviceId = deviceId;
+//	}
 
 
 
@@ -109,18 +135,18 @@ public class DataRecord implements Serializable{
 
 
 
-
-	public byte[] getDurationSeconds() {
-		return durationSeconds;
-	}
-
-
+//
+//	public byte[] getDurationSeconds() {
+//		return durationSeconds;
+//	}
 
 
 
-	public void setDurationSeconds(byte[] durationSeconds) {
-		this.durationSeconds = durationSeconds;
-	}
+
+//
+//	public void setDurationSeconds(byte[] durationSeconds) {
+//		this.durationSeconds = durationSeconds;
+//	}
 
 
 
@@ -181,18 +207,18 @@ public class DataRecord implements Serializable{
 
 
 
-
-	public byte[] getStreetId() {
-		return streetId;
-	}
-
-
+//
+//	public byte[] getStreetId() {
+//		return streetId;
+//	}
 
 
 
-	public void setStreetId(byte[] streetId) {
-		this.streetId = streetId;
-	}
+
+//
+//	public void setStreetId(byte[] streetId) {
+//		this.streetId = streetId;
+//	}
 
 
 
@@ -253,17 +279,17 @@ public class DataRecord implements Serializable{
 
 
 
-	public byte[] getSideofstreet() {
-		return sideofstreet;
-	}
-
-
-
-
-
-	public void setSideofstreet(byte[] sideofstreet) {
-		this.sideofstreet = sideofstreet;
-	}
+//	public byte[] getSideofstreet() {
+//		return sideofstreet;
+//	}
+//
+//
+//
+//
+//
+//	public void setSideofstreet(byte[] sideofstreet) {
+//		this.sideofstreet = sideofstreet;
+//	}
 
 
 	

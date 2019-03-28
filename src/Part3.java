@@ -1,7 +1,4 @@
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -9,7 +6,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.RandomAccessFile;
+import java.io.OptionalDataException;
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.sql.Timestamp;
 import java.text.DateFormat;
@@ -48,9 +46,9 @@ public class Part3 {
 						
 						filename = args[3];
 						outputfilename = "heap."+Integer.parseInt(args[2]);
-						write(filename,outputfilename); // write the data 
-//						readFile(outputfilename); // read the data
-						System.out.println(pages.get(0).getPageNumber());
+//						write(filename,outputfilename); // write the data 
+						readFile(outputfilename); // read the data
+//						System.out.println(pages.get(0).getRecords().size());
 					}
 					else {
 						System.out.println("file name is not correcet! Should be CSV FILE");
@@ -73,7 +71,8 @@ public class Part3 {
 		
 		try(BufferedReader in =new BufferedReader(new FileReader(filename));){
 			
-			FileOutputStream out = new FileOutputStream(outputfilename);
+			FileOutputStream fos = new FileOutputStream(outputfilename);
+			ObjectOutputStream out = new ObjectOutputStream(fos);
 //			RandomAccessFile raf = new RandomAccessFile("heap.txt", "rw");
 			
 //			ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -95,9 +94,12 @@ public class Part3 {
 				 
 //				DataRecord dr = new DataRecord(getByteForInt(record[0]),record[1], record[2], getByteForInt(record[3]), record[4],
 //						record[5], record[6], getByteForInt(record[7]), record[8], record[9], record[10],getByteForInt(record[11]), record[12]);
+//				 
+//				DataRecord dr = new DataRecord(record[0].getBytes(),record[1], record[2], record[3].getBytes(), record[4],
+//							record[5], record[6], record[7].getBytes(), record[8], record[9], record[10],record[11].getBytes(), record[12]);
 				 
-				DataRecord dr = new DataRecord(record[0].getBytes(),record[1], record[2], record[3].getBytes(), record[4],
-							record[5], record[6], record[7].getBytes(), record[8], record[9], record[10],record[11].getBytes(), record[12]);
+				 DataRecord dr = new DataRecord(Integer.parseInt(record[0]),record[1], record[2], Long.parseLong(record[3]), record[4],
+							record[5], record[6], Integer.parseInt(record[7]), record[8], record[9], record[10],Integer.parseInt(record[11]), record[12]);
 					
 				
 //				System.out.println("Record length " + dr.getRecordLength());
@@ -112,9 +114,12 @@ public class Part3 {
 					perPageLength = 0;
 //					System.out.println("Page Break");
 					
-					out.write("\n".getBytes());
+//					out.write("\n".getBytes());
+					out.writeObject("\n");
 					writeRecord(out, dr);
-					out.write("\n".getBytes());
+//					out.write("\n".getBytes());
+					out.writeObject("\n");
+
 					records.add(dr);
 				}
 				else {
@@ -128,12 +133,16 @@ public class Part3 {
 						records.clear();
 						perPageLength = 0;
 						writeRecord(out, dr);
-						out.write("\n".getBytes());
+//						out.write("\n".getBytes());
+						out.writeObject("\n");
+
 					}
 					else {
 						writeRecord(out, dr);
 						
-						out.write("\n".getBytes());
+//						out.write("\n".getBytes());
+						out.writeObject("\n");
+
 						records.add(dr);
 					}
 					
@@ -142,9 +151,9 @@ public class Part3 {
 				out.flush();
 				
 			}
-			
+			out.writeObject(null); // it is used for skipping the eof exception for reading purpose
 			out.close();
-			
+			fos.close();
 			
 			System.out.println("There are " +pages.size() + " Pages");
 			
@@ -165,12 +174,25 @@ public class Part3 {
 		//reading the file
 		
 		FileInputStream fin;
+		ObjectInputStream ois;
 		try {
 			fin = new FileInputStream(outputfilename);
-			int r;
-			while((r=fin.read())!=-1) {
-				System.out.print((char)r);
-			}
+			ois = new ObjectInputStream(fin);
+//			int count = 1;
+			Object obj = null;
+			while ((obj = ois.readObject()) != null) {
+				
+			      if (obj instanceof DataRecord) {
+			        System.out.print(((DataRecord) obj).toString());
+
+			      }
+			      else {
+			    	  System.out.print(obj);
+			      }
+
+			   }
+			
+			ois.close();
 			fin.close();
 			
 		} catch (FileNotFoundException e) {
@@ -179,28 +201,34 @@ public class Part3 {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+		
 		
 		
 
 		
 	}
 	
-	public static void writeRecord(FileOutputStream raf,DataRecord record) {
+	public static void writeRecord(ObjectOutputStream raf,DataRecord record) {
 		try {
-			raf.write(record.getDeviceId()); raf.write(",".getBytes());
-			raf.write(record.getArrivalByte());raf.write(",".getBytes());
-			raf.write(record.getDepartureByte());raf.write(",".getBytes());
-			raf.write(record.getDurationSeconds());raf.write(",".getBytes());
-			raf.write(record.getMarkerByte());raf.write(",".getBytes());
-			raf.write(record.getSignByte());raf.write(",".getBytes());
-			raf.write(record.getAreaByte());raf.write(",".getBytes());
-			raf.write(record.getStreetId());raf.write(",".getBytes());
-			raf.write(record.getStreetNameByte());raf.write(",".getBytes());
-			raf.write(record.getBetweenStreet1Byte());raf.write(",".getBytes());
-			raf.write(record.getBetweenStreet2Byte());raf.write(",".getBytes());
-			raf.write(record.getSideofstreet());raf.write(",".getBytes());
-			raf.write(record.getInViolationByte()); 
+			
+			raf.writeObject(record);
+//			raf.write(record.getDeviceId()); raf.write(",".getBytes());
+//			raf.write(record.getArrivalByte());raf.write(",".getBytes());
+//			raf.write(record.getDepartureByte());raf.write(",".getBytes());
+//			raf.write(record.getDurationSeconds());raf.write(",".getBytes());
+//			raf.write(record.getMarkerByte());raf.write(",".getBytes());
+//			raf.write(record.getSignByte());raf.write(",".getBytes());
+//			raf.write(record.getAreaByte());raf.write(",".getBytes());
+//			raf.write(record.getStreetId());raf.write(",".getBytes());
+//			raf.write(record.getStreetNameByte());raf.write(",".getBytes());
+//			raf.write(record.getBetweenStreet1Byte());raf.write(",".getBytes());
+//			raf.write(record.getBetweenStreet2Byte());raf.write(",".getBytes());
+//			raf.write(record.getSideofstreet());raf.write(",".getBytes());
+//			raf.write(record.getInViolationByte()); 
 			
 //			raf.close();
 			
@@ -210,6 +238,7 @@ public class Part3 {
 		}
 	}
 	
+	public class EndOfStreamSignal implements Serializable {}
 	public static byte[] getByteForInt(String s) {
 		ByteBuffer buf = ByteBuffer.allocate(INTFIELD);
 		buf.putInt(Integer.parseInt(s));
